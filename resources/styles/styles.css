@@ -1,6 +1,28 @@
+@import url(https://db.onlinewebfonts.com/c/b3eb82ab9bde704e6b28e21f047bfd0d?family=Sutro+W00+Black+Initials);
+@import url(https://db.onlinewebfonts.com/c/93d0fffe7e6f2b31acd29ec0dfd80d35?family=Sutro+W01+Medium);
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 @import "tailwindcss";
 @import "./fonts.css";
 
-html {
-  font-family: "Roboto", sans-serif;
+@theme {
+    --font-sutro: "Sutro W01 Medium", serif;
+    --font-sutroBlack: "Sutro W00 Black Initials", serif;
+    --font-open: "Inter", sans-serif;
+}
+
+@layer components {
+    .title-style {
+        @apply font-sutroBlack leading-[0.9] text-8xl;
+    }
+
+    .h1-style {
+        @apply font-sutro text-2xl leading-none;
+    }
+
+    .h2-style {
+        @apply font-open font-medium text-xl;
+    }
 }
