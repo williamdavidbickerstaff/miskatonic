@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "./fonts.css";
+
+html {
+  font-family: "Roboto", sans-serif;
+}
