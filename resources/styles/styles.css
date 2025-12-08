@@ -12,7 +12,7 @@ html {
 
 /* Embla carousel container with arrows */
 .embla {
-    overflow: hidden;
+    overflow: visible;
     margin: auto;
     --slide-height: 19rem;
     --slide-spacing: 2rem;
