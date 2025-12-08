@@ -16,6 +16,8 @@
     "vite-plugin-image-optimizer": "^2.0.2"
   },
   "dependencies": {
+    "embla-carousel": "^8.6.0",
+    "embla-carousel-fade": "^8.6.0",
     "gsap": "^3.13.0"
   }
 }

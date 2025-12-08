@@ -1,16 +1,82 @@
 @import url(https://db.onlinewebfonts.com/c/b3eb82ab9bde704e6b28e21f047bfd0d?family=Sutro+W00+Black+Initials);
 @import url(https://db.onlinewebfonts.com/c/93d0fffe7e6f2b31acd29ec0dfd80d35?family=Sutro+W01+Medium);
-
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 @import "tailwindcss";
 @import "./fonts.css";
 
+html {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Embla carousel container with arrows */
+.embla {
+    overflow: hidden;
+    margin: auto;
+    --slide-height: 19rem;
+    --slide-spacing: 2rem;
+    --slide-size: 33%;
+}
+
+.embla__viewport {
+    overflow: hidden;
+}
+
+.embla__container {
+    display: flex;
+    touch-action: pan-y pinch-zoom;
+    margin-left: calc(var(--slide-spacing) * -1);
+}
+
+.embla__slide {
+    transform: translate3d(0, 0, 0);
+    flex: 0 0 var(--slide-size);
+    min-width: 0;
+    padding-left: var(--slide-spacing);
+}
+
+/* Embla Arrow Buttons - minimal CSS, positioning in Tailwind */
+.embla__button {
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.embla__button svg {
+    fill: currentColor;
+}
+
+/* Dots styling */
+.embla__dots {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.embla__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #b3b3b3;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.embla__dot--selected {
+    background-color: #000;
+}
+
 @theme {
     --font-sutro: "Sutro W01 Medium", serif;
     --font-sutroBlack: "Sutro W00 Black Initials", serif;
     --font-open: "Inter", sans-serif;
+
+    --color-bg: var(--bg);
+    --color-text: var(--text);
 }
 
 @layer components {
@@ -19,10 +85,59 @@
     }
 
     .h1-style {
-        @apply font-sutro text-2xl leading-none;
+        @apply font-sutro font-medium text-2xl leading-none;
     }
 
     .h2-style {
         @apply font-open font-medium text-xl;
     }
+
+    .h3-style {
+        @apply font-open font-medium text-base;
+    }
+
+    .h4-style {
+        @apply font-open font-light text-sm;
+    }
+
+    .link {
+        @apply font-open font-light text-base underline;
+    }
+
+    .p-style {
+        @apply font-open font-normal text-lg leading-5;
+    }
+
+    .p-style-light {
+        @apply font-open font-light text-lg leading-5;
+    }
+
+    .p-style-small {
+        @apply font-open font-normal text-base leading-5;
+    }
+
+    .p-style-small-medium {
+        @apply font-open font-medium text-base leading-5;
+    }
+
+    .preload {
+        @apply visible opacity-100
+    }
+
+    .post-content p {
+        @apply font-open font-normal text-lg leading-5;
+    }
+
+    .post-content h2 {
+        @apply font-sutro font-medium text-2xl leading-none text-left;
+    }
+
+    .post-content h3 {
+        @apply font-open font-medium text-xl;
+    }
+
+    .post-content a {
+        @apply font-open font-light text-base underline hover:no-underline;
+    }
+
 }
