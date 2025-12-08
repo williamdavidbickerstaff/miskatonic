@@ -180,8 +180,8 @@ endif;
                     <?php the_content() ?>
                 </div>
 
-                <!-- Merch section !-->
 
+                <!-- Merch section !-->
                 <?php if (em_is_event_page()): ?>
 
                     <section class="embla col-span-6 grid grid-cols-subgrid">
@@ -192,16 +192,6 @@ endif;
                             </h1>
 
                             <div class="embla__controls flex gap-4 items-center">
-                                <!-- Previous Arrow -->
-                                <button class="embla__button embla__button--prev" type="button" aria-label="Previous">
-                                    <?= page_turner_left('class="w-4 h-4"'); ?>
-                                </button>
-
-                                <!-- Next Arrow -->
-                                <button class="embla__button embla__button--next" type="button" aria-label="Next">
-                                    <?= page_turner_right('class="w-4 h-4"'); ?>
-                                </button>
-
                                 <!-- Dots -->
                                 <div class="embla__dots"></div>
                             </div>
@@ -209,6 +199,20 @@ endif;
 
                         <!-- Carousel with arrows positioned on sides -->
                         <div class="col-span-6 mt-6 relative">
+                            <!-- Previous Arrow - positioned on left -->
+                            <button
+                                class="embla__button embla__button--prev absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 hover:opacity-70 transition-opacity"
+                                type="button" aria-label="Previous">
+                                <?= page_turner_left('class="w-6 h-6"'); ?>
+                            </button>
+
+                            <!-- Next Arrow - positioned on right -->
+                            <button
+                                class="embla__button embla__button--next absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 hover:opacity-70 transition-opacity"
+                                type="button" aria-label="Next">
+                                <?= page_turner_right('class="w-6 h-6"'); ?>
+                            </button>
+
                             <div class="embla__viewport">
                                 <div class="embla__container">
                                     <div class="embla__slide">
@@ -277,17 +281,13 @@ endif;
                                             </p>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
-
-
                         </div>
 
                     </section>
 
                 <?php endif; ?>
-
             <?php endwhile; ?>
         </div>
     </div>
