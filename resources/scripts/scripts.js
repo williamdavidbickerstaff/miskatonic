@@ -1,4 +1,6 @@
-console.log("hello world");
+/**
+ * Embla Carousel initialization
+ */
 
 import EmblaCarousel from "embla-carousel";
 import Fade from "embla-carousel-fade";

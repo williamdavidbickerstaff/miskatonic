@@ -1,20 +1,22 @@
+/**
+ * Main application entry point
+ * Initializes all GSAP animations and interactions
+ */
+
 import { initMenuAnimations } from "./GSAP/menu-animations";
 import { initWordmarkAnimations } from "./GSAP/wordmark-animation";
 import { initInvertOnHover } from "./GSAP/invert-on-hover";
-import { initPageFadeIn } from "./GSAP/page-fade-in"; // Add this
-import { initContentFadeIn } from "./GSAP/page-fade-in";
-import { initPageTransitions } from "./GSAP/page-fade-in";
-import { initSimplePageTransitions } from "./GSAP/page-fade-in";
+import {
+    initContentFadeIn,
+    initSimplePageTransitions,
+} from "./GSAP/page-fade-in";
 
-// Initialize fade-in as early as possible to prevent FOUC
 function initializeApp() {
-    console.log("DOM loaded");
-
-    // Start fade-in immediately - this is critical to prevent flash
+    // Page transitions - must run first to prevent FOUC
     initContentFadeIn();
-
-    // Initialize other features
     initSimplePageTransitions();
+
+    // Interactive animations
     initMenuAnimations();
     initWordmarkAnimations();
     initInvertOnHover();
@@ -24,6 +26,5 @@ function initializeApp() {
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initializeApp);
 } else {
-    // DOM is already ready, run immediately
     initializeApp();
 }

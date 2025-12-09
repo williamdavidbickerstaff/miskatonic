@@ -52,14 +52,13 @@ function content_replacements($content)
 {
     // Replace any line containing only "++++"
     $content = preg_replace('/\+{4,}/', '<hr />', $content);
-
     return $content;
 }
 add_filter('the_content', 'content_replacements');
 
 function title_replacements($title)
 {
-    return $title = ucwords(strtolower($title));
+    return ucwords(strtolower($title));
 }
 add_filter('the_title', 'title_replacements');
 
@@ -78,43 +77,136 @@ function page_turner_right($attrs = '')
     return '<svg ' . $attrs . ' width="14" height="12" viewBox="0 0 14 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M0.75 4.77344C0.335786 4.77344 0 5.10922 0 5.52344C0 5.93765 0.335786 6.27344 0.75 6.27344V5.52344V4.77344ZM13.2803 6.05377C13.5732 5.76087 13.5732 5.286 13.2803 4.99311L8.50736 0.220137C8.21447 -0.0727568 7.73959 -0.0727568 7.4467 0.220137C7.15381 0.51303 7.15381 0.987904 7.4467 1.2808L11.6893 5.52344L7.4467 9.76608C7.15381 10.059 7.15381 10.5338 7.4467 10.8267C7.73959 11.1196 8.21447 11.1196 8.50736 10.8267L13.2803 6.05377ZM0.75 5.52344V6.27344L12.75 6.27344V5.52344V4.77344L0.75 4.77344V5.52344Z"/></svg>';
 }
 
-function insert_navbar($attrs = '')
+// ============================================
+// PAGE LINK CONSTANTS
+// ============================================
+
+define('PAGE_ID_TALKS', 15);
+define('PAGE_ID_NEWS', 2603);
+define('PAGE_ID_ARCHIVE', 252);
+
+
+// ============================================
+// UI COMPONENT HELPERS
+// ============================================
+
+/**
+ * Render a ticket link with arrow icon
+ */
+function ticket_link($url, $class = 'text-white')
 {
-    $talks_link = get_page_link(15);
-    $news_link = get_page_link(2603);
-    $archive_link = get_page_link(252);
+    $icon = miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em] top-[0.1em]"');
+    return '<a href="' . esc_url($url) . '" class="' . $class . ' link inline-flex items-center gap-2">
+        Tickets ' . $icon . '
+    </a>';
+}
 
-    return
-        '
-        <ul class="flex flex-col col-span-8 gap-0 h-fit ' . $attrs . '">
-            <a href="' . $talks_link . '" class="block">
-                <li class="h-full h2-style leading-none menu-item" data-menu-item>
-                    <label class="h-full flex items-center justify-start">Talks</label>
-                </li>
-            </a>
-            <li class="h-full h2-style leading-none menu-item" data-menu-item>
-                <label class="h-full flex items-center justify-start">Speakers</label>
-            </li>      
-            <a href="' . $archive_link . '" class="block">
-                <li class="h-full h2-style leading-none menu-item" data-menu-item>
-                    <label class="h-full flex items-center justify-start">Archive</label>
-                </li>
-            </a>
-            <a href="' . $news_link . '" class="block">
-                <li class="h-full h2-style leading-none menu-item" data-menu-item>
-                    <label class="h-full flex items-center justify-start">News</label>
-                </li>
-            </a>
-            <li class="h-full h2-style leading-none menu-item" data-menu-item>
-                <label class="h-full flex items-center justify-start">FAQ</label>
-            </li>
-            <li class="h-full h2-style leading-none menu-item" data-menu-item>
-                <label class="h-full flex items-center justify-start">About</label>
-            </li>
-            <li class="h-full h2-style leading-none menu-item" data-menu-item>
-                <label class="h-full flex items-center justify-start">Contact</label>
-            </li>
-        </ul>
+/**
+ * Render an event tag badge
+ */
+function event_badge($tag, $position = 'bottom-4 right-4')
+{
+    return '<div class="
+        group-hover:invert transition duration-300
+        absolute ' . $position . '
+        outline w-48 p-2
+        bg-black text-white
+        h4-style font-medium leading-none text-left
+    ">' . $tag . '</div>';
+}
 
+/**
+ * Render the main navigation menu
+ */
+function insert_navbar($theme = 'dark')
+{
+    $links = [
+        ['url' => get_page_link(PAGE_ID_TALKS), 'label' => 'Talks'],
+        ['url' => null, 'label' => 'Speakers'],
+        ['url' => get_page_link(PAGE_ID_ARCHIVE), 'label' => 'Archive'],
+        ['url' => get_page_link(PAGE_ID_NEWS), 'label' => 'News'],
+        ['url' => null, 'label' => 'FAQ'],
+        ['url' => null, 'label' => 'About'],
+        ['url' => null, 'label' => 'Contact'],
+    ];
+
+    $output = '<ul class="flex flex-col col-span-8 gap-0 h-fit ' . $theme . '">';
+
+    foreach ($links as $link) {
+        $item = '<li class="h-full h2-style leading-none menu-item" data-menu-item>
+            <label class="h-full flex items-center justify-start">' . esc_html($link['label']) . '</label>
+        </li>';
+
+        if ($link['url']) {
+            $output .= '<a href="' . esc_url($link['url']) . '" class="block">' . $item . '</a>';
+        } else {
+            $output .= $item;
+        }
+    }
+
+    $output .= '</ul>';
+    return $output;
+}
+
+/**
+ * Render a filter checkbox
+ */
+function filter_checkbox($label)
+{
+    return '<label class="flex items-center gap-2 justify-between text-white cursor-pointer">
+        <span class="underline">' . esc_html($label) . '</span>
+        <input type="checkbox" class="
+            appearance-none w-4 h-4 border border-white bg-transparent
+            checked:bg-white checked:border-white focus:outline-none
+        " />
+    </label>';
+}
+
+/**
+ * Render a semester pass button
+ */
+function semester_pass_button($label, $status = 'Sold out')
+{
+    $icon = miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em]"');
+    return '<div class="
+        w-full outline outline-offset-[-1px] bg-black text-white outline-white
+        flex justify-between items-center px-2 py-2 invert-on-hover
+    ">
+        <span class="h4-style font-medium">' . esc_html($label) . ' ' . $icon . '</span>
+        <span class="text-white h4-style font-medium">' . esc_html($status) . '</span>
+    </div>';
+}
+
+/**
+ * Render the MISKATONIC wordmark
+ * @param string|null $subtitle Optional subtitle (e.g., "Talks", "Archive")
+ * @param string $text_class Text color class (default: 'text-white')
+ */
+function miskatonic_wordmark($subtitle = null, $text_class = 'text-white')
+{
+    $output = '
+    <a href="' . home_url() . '" class="block">
+        <h1 class="' . $text_class . ' title-style wordmark-element" data-wordmark>MIS</h1>
+        <h1 class="' . $text_class . ' title-style wordmark-element" data-wordmark>KA</h1>
+        <h1 class="' . $text_class . ' title-style wordmark-element" data-wordmark>TON</h1>
+        <h1 class="' . $text_class . ' title-style wordmark-element" data-wordmark>IC</h1>
+    </a>
+    <div class="col-span-2 flex flex-col items-start justify-between pt-6 gap-4">
+        <h1 class="h1-style ' . $text_class . ' text-wrap wordmark-element" data-wordmark>
+            Institute of <br> Horror Studies
+        </h1>
     ';
+
+    if ($subtitle) {
+        $outline_class = ($text_class === 'text-white') ? 'outline-white' : 'outline-black';
+        $output .= '
+        <div class="w-6 h-0 outline ' . $outline_class . ' wordmark-element" data-wordmark></div>
+        <h1 class="h1-style ' . $text_class . ' text-wrap wordmark-element" data-wordmark>
+            ' . esc_html($subtitle) . '
+        </h1>';
+    }
+
+    $output .= '</div>';
+
+    return $output;
 }

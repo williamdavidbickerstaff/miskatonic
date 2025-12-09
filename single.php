@@ -1,185 +1,175 @@
 <?php
+/**
+ * Single Post/Event Template
+ * Handles both regular posts and Events Manager events
+ */
 
-//true = white
-//false = black
-define("theme", true);
+// ============================================
+// THEME CONFIGURATION
+// ============================================
 
-function my_plugin_body_class($classes)
-{
-    $classes[] = theme ? 'bg-white' : 'bg-black';
+// true = light theme (white bg), false = dark theme (black bg)
+define('THEME_IS_LIGHT', true);
+
+$theme_bg = THEME_IS_LIGHT ? 'bg-white' : 'bg-black';
+$theme_text = THEME_IS_LIGHT ? 'text-black' : 'text-white';
+$theme_navbar = THEME_IS_LIGHT ? 'light' : 'dark';
+
+add_filter('body_class', function ($classes) use ($theme_bg) {
+    $classes[] = $theme_bg;
     return $classes;
-}
+});
 
-add_filter('body_class', 'my_plugin_body_class');
 get_header();
 
-if (em_is_event_page()):
-    // SINGLE EVENT INFO
+// ============================================
+// DATA FETCHING
+// ============================================
+
+$is_event = em_is_event_page();
+$current_event = null;
+$related_events = [];
+
+if ($is_event) {
+    // Current Event Data
     $event = em_get_event(get_the_ID(), 'post_id');
     $current_event_id = $event->event_id;
 
-    $image = $event->output('#_EVENTIMAGE{medium}');
-    $tags = $event->output('#_EVENTTAGS');
-    $speaker = $event->output('#_CATEGORYNAME');
-    $date = $event->output('#_EVENTSTARTDATE');
-    $paylink = $event->output('#_ATT{paylink}');
-    $ticket_price = $event->output('#_ATT{admission}');
-    $watchlist = $event->output('#_ATT{watchlist}');
-    $event_status = ($event->start()->getTimestamp() <= current_time('timestamp')) ? 'ended' : 'active';
+    $current_event = [
+        'image' => $event->output('#_EVENTIMAGE{medium}'),
+        'tags' => $event->output('#_EVENTTAGS'),
+        'speaker' => $event->output('#_CATEGORYNAME'),
+        'date' => $event->output('#_EVENTSTARTDATE'),
+        'paylink' => $event->output('#_ATT{paylink}'),
+        'ticket_price' => $event->output('#_ATT{admission}'),
+        'watchlist' => $event->output('#_ATT{watchlist}'),
+        'is_active' => $event->start()->getTimestamp() > current_time('timestamp'),
+    ];
 
-    //EVENT LIST INFO
+    // Related Events (excluding current)
     if (class_exists('EM_Events')) {
-        $other_events = EM_Events::get(array(
+        $all_events = EM_Events::get([
             'limit' => 3,
             'orderby' => 'date'
-        ));
+        ]);
 
-        if (isset($other_events)) {
-            $other_events = array_filter($other_events, function ($evt) use ($current_event_id) {
-                return $evt->event_id !== $current_event_id;
-            });
-            $other_events = array_values($other_events);
-            $other_events = array_slice($other_events, 0, 2);
+        $filtered = array_filter($all_events, function ($evt) use ($current_event_id) {
+            return $evt->event_id !== $current_event_id;
+        });
+
+        $filtered = array_slice(array_values($filtered), 0, 2);
+
+        foreach ($filtered as $evt) {
+            $name_words = explode(' ', $evt->event_name);
+            array_pop($name_words);
+
+            $related_events[] = [
+                'name' => implode(' ', $name_words),
+                'image' => $evt->output('#_EVENTIMAGE{medium}'),
+                'date' => $evt->output('#_EVENTSTARTDATE'),
+                'instructor' => $evt->output('#_CATEGORYNAME'),
+                'url' => $evt->output('#_EVENTURL'),
+                'ticket_url' => $evt->output('#_ATT{paylink}'),
+                'tag' => $evt->output('#_EVENTTAGS'),
+            ];
         }
-        $events_length = count($other_events);
     }
-    // events
-    $trimmed_names = [];
-    $event_images = [];
-    $event_instructors = [];
-    $event_dates = [];
-    $event_urls = [];
-    $event_tickets = [];
-    $event_tags = [];
+}
 
-    foreach ($other_events as $other_event) {
+$related_count = count($related_events);
 
-        #event name
-        $event_name = $other_event->event_name;
-        $words = explode(' ', $event_name);
-        array_pop($words);
-        $trimmed_name = implode(' ', $words);
-
-        $event_image = $other_event->output('#_EVENTIMAGE{medium}');
-        $event_date = $other_event->output('#_EVENTSTARTDATE');
-        $event_instructor = $other_event->output('#_CATEGORYNAME');
-        $event_url = $other_event->output('#_EVENTURL');
-        $event_ticket = $other_event->output('#_ATT{paylink}');
-        $event_tag = $other_event->output('#_EVENTTAGS');
-
-        $trimmed_names[] = $trimmed_name;
-        $event_images[] = $event_image;
-
-        $event_dates[] = $event_date;
-        $event_instructors[] = $event_instructor;
-        $event_urls[] = $event_url;
-        $event_tickets[] = $event_ticket;
-        $event_tags[] = $event_tag;
-    }
-
-endif;
+// Merch items for carousel
+$merch_items = [
+    ['image' => 'https://placehold.co/212x299', 'title' => 'Bert Hardy RAF Men Poster A2'],
+    ['image' => 'https://placehold.co/212x148', 'title' => 'Boris Mikhailov: Yesterday\'s Sandwich Two Poster A2'],
+    ['image' => 'https://placehold.co/212x235', 'title' => 'Daido Moriyama Stray Dog Tote Bag'],
+    ['image' => 'https://placehold.co/212x299', 'title' => 'Bert Hardy RAF Men Poster A2'],
+    ['image' => 'https://placehold.co/212x299', 'title' => 'Bert Hardy RAF Men Poster A2'],
+    ['image' => 'https://placehold.co/212x299', 'title' => 'Bert Hardy RAF Men Poster A2'],
+    ['image' => 'https://placehold.co/212x299', 'title' => 'Bert Hardy RAF Men Poster A2'],
+    ['image' => 'https://placehold.co/212x299', 'title' => 'Bert Hardy RAF Men Poster A2'],
+];
 ?>
 
-<div class="mx-auto max-w-[1440px] pb-6
-    <?php
-    $text_col = theme ? 'text-black' : 'text-white';
-    echo $text_col;
-    ?>
-">
-    <div class="grid grid-cols-12 gap-6 mx-6">
-        <div class="col-span-4 flex flex-col items-start justify-between pt-6 h-fit
-        ">
-            <a href="<?php echo home_url() ?>">
-                <h1 class="title-style wordmark-element" data-wordmark>MIS</h1>
-                <h1 class="title-style wordmark-element" data-wordmark>KA</h1>
-                <h1 class="title-style wordmark-element" data-wordmark>TON</h1>
-                <h1 class="title-style wordmark-element" data-wordmark>IC</h1>
-            </a>
 
-            <div class="col-span-2 flex flex-col items-start justify-between pt-6 gap-4">
-                <h1 class="h1-style text-wrap wordmark-element" data-wordmark>
-                    Institute of <br> Horror Studies
-                </h1>
-            </div>
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+
+<div class="mx-auto max-w-[1440px] pb-6 <?= $theme_text ?>">
+    <div class="grid grid-cols-12 gap-6 mx-6">
+
+        <!-- Wordmark -->
+        <div class="col-span-4 flex flex-col items-start justify-between pt-6 h-fit">
+            <?= miskatonic_wordmark(null, '') ?>
         </div>
 
+        <!-- Main Content Area -->
         <div class="col-start-5 col-span-8 pt-6 grid grid-cols-subgrid">
-
-            <?php
-            $navbar_col = (theme) ? 'light' : 'dark';
-            echo insert_navbar($navbar_col)
-                ?>
+            <?= insert_navbar($theme_navbar) ?>
 
             <?php while (have_posts()):
                 the_post(); ?>
 
-                <?php if (has_post_thumbnail() && (!em_is_event_page())):
-                    $featured_image = wp_get_attachment_image_src(get_post_thumbnail_id(get_the_ID()), 'full'); ?>
-
-                    <img class="col-span-8 mt-6 outline outline-offset-[-1px]" src="<?php echo $featured_image[0] ?>">
-                    </img>
-
+                <!-- Featured Image (Posts only) -->
+                <?php if (has_post_thumbnail() && !$is_event): ?>
+                    <?php $featured_image = wp_get_attachment_image_src(get_post_thumbnail_id(get_the_ID()), 'full'); ?>
+                    <img class="col-span-8 mt-6 outline outline-offset-[-1px]" src="<?= esc_url($featured_image[0]) ?>"
+                        alt="<?= esc_attr(get_the_title()) ?>" />
                 <?php endif; ?>
 
-                <?php if (em_is_event_page()): ?>
-                    <div class="col-span-8 mt-6 relative [&_img]:w-full [&_img]:h-full [&_img]:object-cover">
-                        <?= $image; ?>
-                        <!-- Bottom-right badge -->
-                        <?php if ($tags !== ''): ?>
-                            <div
-                                class="absolute leading-none text-left bottom-4 right-4 outline w-48 p-2 bg-black text-white h4-style font-medium invert">
-                                <?= $tags; ?>
+                <!-- Event Image (Events only) -->
+                <?php if ($is_event): ?>
+                    <div class="
+                        col-span-8 mt-6 relative
+                        [&_img]:w-full [&_img]:h-full [&_img]:object-cover
+                    ">
+                        <?= $current_event['image'] ?>
+
+                        <?php if (!empty($current_event['tags'])): ?>
+                            <div class="
+                                absolute bottom-4 right-4
+                                outline w-48 p-2
+                                bg-black text-white invert
+                                h4-style font-medium leading-none text-left
+                            ">
+                                <?= $current_event['tags'] ?>
                             </div>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
 
+                <!-- Title -->
                 <h2 class="
-                <?php $height = (em_is_event_page()) ? 'min-h-32' : '';
-                echo $height; ?>
-                h2-style col-span-4 mt-6
+                    h2-style col-span-4 mt-6
+                    <?= $is_event ? 'min-h-32' : '' ?>
                 ">
                     <?php
                     $title = get_the_title();
-                    $title = preg_replace('/\s*\((online|london)\)\s*/i', '', $title);
-                    echo $title;
+                    $title = preg_replace('/\s*\((online|london|nyc)\)\s*/i', '', $title);
+                    echo esc_html($title);
                     ?>
                 </h2>
 
-                <?php
-                if (em_is_event_page()):
-                    ?>
-
-                    <div
-                        class="col-span-7 grid grid-cols-subgrid p-6 mt-6 bg-white outline outline-offset-[-1px] outline-black">
-                        <!-- left text -->
+                <!-- Event Details Box (Events only) -->
+                <?php if ($is_event): ?>
+                    <div class="
+                        col-span-7 grid grid-cols-subgrid
+                        p-6 mt-6
+                        bg-white outline outline-offset-[-1px] outline-black
+                    ">
+                        <!-- Event Info -->
                         <div class="col-span-4 justify-start flex flex-col gap-6">
                             <div>
-                                <h2 class="h2-style">
-                                    Speaker
-                                </h2>
-                                <p class="p-style-small">
-                                    <?php
-                                    echo $speaker;
-                                    ?>
-                                </p>
+                                <h2 class="h2-style">Speaker</h2>
+                                <p class="p-style-small"><?= esc_html($current_event['speaker']) ?></p>
                             </div>
                             <div>
-                                <h2 class="h2-style">
-                                    Date and time
-                                </h2>
-                                <p class="p-style-small">
-                                    <?php
-                                    echo $date;
-                                    ?>
-                                </p>
+                                <h2 class="h2-style">Date and time</h2>
+                                <p class="p-style-small"><?= esc_html($current_event['date']) ?></p>
                             </div>
                             <div>
-                                <h2 class="h2-style">
-                                    Admission
-
-                                    <?= $event->condition == 'is_past'; ?>
-                                </h2>
+                                <h2 class="h2-style">Admission</h2>
                                 <p class="p-style-small">
                                     Zoom registration links for each class are included in your order confirmation email from
                                     Billeto -- after registering, you'll receive a second email with the link to the Zoom
@@ -187,250 +177,220 @@ endif;
                                 </p>
                             </div>
                         </div>
-                        <!-- right text -->
-                        <?php if ($event_status == 'active'): ?>
+
+                        <!-- Ticket Options (Active events only) -->
+                        <?php if ($current_event['is_active']): ?>
                             <div class="col-span-3 justify-start flex flex-col gap-6">
-                                <a href="<?php echo $paylink; ?>" class="block">
-                                    <div
-                                        class="
-                            bg-white outline outline-offset-[-1px] p-2.5 flex justify-between items-center invert-on-hover">
-                                        <div class="justify-start p-style-small-medium">
+
+                                <!-- Individual Ticket -->
+                                <a href="<?= esc_url($current_event['paylink']) ?>" class="block">
+                                    <div class="
+                                        bg-white outline outline-offset-[-1px]
+                                        p-2.5 flex justify-between items-center
+                                        invert-on-hover
+                                    ">
+                                        <div class="p-style-small-medium">
                                             Individual Ticket
-                                            <?= miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em]"'); ?>
+                                            <?= miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em]"') ?>
                                         </div>
                                         <div class="p-style-small-medium">
-                                            <?php echo $ticket_price; ?>
+                                            <?= esc_html($current_event['ticket_price']) ?>
                                         </div>
                                     </div>
                                 </a>
-                                <div
-                                    class="
-                            bg-white outline outline-offset-[-1px] p-2.5 flex justify-between items-center invert-on-hover">
-                                    <div class="justify-start p-style-small-medium">
-                                        Online Semester Pass
-                                        <?= miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em]"'); ?>
-                                    </div>
+
+                                <!-- Semester Pass -->
+                                <div class="
+                                    bg-white outline outline-offset-[-1px]
+                                    p-2.5 flex justify-between items-center
+                                    invert-on-hover
+                                ">
                                     <div class="p-style-small-medium">
-                                        £10
+                                        Online Semester Pass
+                                        <?= miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em]"') ?>
                                     </div>
+                                    <div class="p-style-small-medium">£10</div>
                                 </div>
-                                <?php
-                                if ($watchlist):
-                                    ?>
-                                    <a href="<?php echo $watchlist ?>" class="block">
-                                        <div
-                                            class="
-                            bg-white outline outline-offset-[-1px] p-2.5 flex justify-between items-center invert-on-hover">
-                                            <div class="justify-start p-style-small-medium">
+
+                                <!-- Watchlist (if available) -->
+                                <?php if (!empty($current_event['watchlist'])): ?>
+                                    <a href="<?= esc_url($current_event['watchlist']) ?>" class="block">
+                                        <div class="
+                                            bg-white outline outline-offset-[-1px]
+                                            p-2.5 flex justify-between items-center
+                                            invert-on-hover
+                                        ">
+                                            <div class="p-style-small-medium">
                                                 Watchlist
-                                                <?= miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em]"'); ?>
+                                                <?= miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em]"') ?>
                                             </div>
                                         </div>
                                     </a>
                                 <?php endif; ?>
+
                             </div>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
 
-
+                <!-- Post Content -->
                 <div class="col-span-8 w-[95%] mt-6 flex flex-col gap-6 post-content">
-                    <?php the_content() ?>
+                    <?php the_content(); ?>
                 </div>
 
 
-                <!-- Merch section !-->
-                <?php if (em_is_event_page() && $event_status == 'active'): ?>
+                <!-- ============================================
+                     MERCHANDISE CAROUSEL (Active Events Only)
+                     ============================================ -->
 
+                <?php if ($is_event && $current_event['is_active']): ?>
                     <section class="embla col-span-6 grid grid-cols-subgrid">
 
+                        <!-- Carousel Header -->
                         <div class="col-span-6 mt-6 flex items-center justify-between">
-                            <h1 class="h1-style">
-                                On sale at our talks
-                            </h1>
-
+                            <h1 class="h1-style">On sale at our talks</h1>
                             <div class="embla__controls flex gap-4 items-center">
-                                <!-- Dots -->
                                 <div class="embla__dots"></div>
                             </div>
                         </div>
 
-                        <!-- Carousel with arrows positioned on sides -->
+                        <!-- Carousel -->
                         <div class="col-span-6 mt-6 relative">
-                            <!-- Previous Arrow - positioned on left -->
-                            <button
-                                class="scale-[70%] embla__button embla__button--prev absolute left-[-50px] top-1/2 -translate-y-1/2 z-10 p-2 hover:opacity-70 transition-opacity"
-                                type="button" aria-label="Previous">
-                                <?= page_turner_left('class="w-6 h-6"'); ?>
+                            <!-- Previous Arrow -->
+                            <button class="
+                                    scale-[70%] embla__button embla__button--prev
+                                    absolute left-[-50px] top-1/2 -translate-y-1/2 z-10
+                                    p-2 hover:opacity-70 transition-opacity
+                                " type="button" aria-label="Previous">
+                                <?= page_turner_left('class="w-6 h-6"') ?>
                             </button>
 
-                            <!-- Next Arrow - positioned on right -->
-                            <button
-                                class="scale-[70%] embla__button embla__button--next absolute right-[-50px] top-1/2 -translate-y-1/2 z-10 p-2 hover:opacity-70 transition-opacity"
-                                type="button" aria-label="Next">
-                                <?= page_turner_right('class="w-6 h-6"'); ?>
+                            <!-- Next Arrow -->
+                            <button class="
+                                    scale-[70%] embla__button embla__button--next
+                                    absolute right-[-50px] top-1/2 -translate-y-1/2 z-10
+                                    p-2 hover:opacity-70 transition-opacity
+                                " type="button" aria-label="Next">
+                                <?= page_turner_right('class="w-6 h-6"') ?>
                             </button>
 
+                            <!-- Slides -->
                             <div class="embla__viewport">
                                 <div class="embla__container">
-                                    <div class="embla__slide">
-                                        <div class="">
-                                            <img class="self-stretch" src="https://placehold.co/212x299" />
-                                            <p class="p-style-small mt-6">
-                                                Bert Hardy RAF Men Poster A2
-                                            </p>
+                                    <?php foreach ($merch_items as $item): ?>
+                                        <div class="embla__slide">
+                                            <div>
+                                                <img class="self-stretch" src="<?= esc_url($item['image']) ?>"
+                                                    alt="<?= esc_attr($item['title']) ?>" />
+                                                <p class="p-style-small mt-6">
+                                                    <?= esc_html($item['title']) ?>
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-
-                                    <div class="embla__slide">
-                                        <div class="">
-                                            <img class="self-stretch" src="https://placehold.co/212x148" />
-                                            <p class="p-style-small mt-6">
-                                                Boris Mikhailov: Yesterday's Sandwich Two Poster A2
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div class="embla__slide">
-                                        <div class="">
-                                            <img class="self-stretch" src="https://placehold.co/212x235" />
-                                            <p class="p-style-small mt-6">
-                                                Daido Moriyama Stray Dog Tote Bag
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="embla__slide">
-                                        <div class="">
-                                            <img class="self-stretch" src="https://placehold.co/212x299" />
-                                            <p class="p-style-small mt-6">
-                                                Bert Hardy RAF Men Poster A2
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="embla__slide">
-                                        <div class="">
-                                            <img class="self-stretch" src="https://placehold.co/212x299" />
-                                            <p class="p-style-small mt-6">
-                                                Bert Hardy RAF Men Poster A2
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="embla__slide">
-                                        <div class="">
-                                            <img class="self-stretch" src="https://placehold.co/212x299" />
-                                            <p class="p-style-small mt-6">
-                                                Bert Hardy RAF Men Poster A2
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="embla__slide">
-                                        <div class="">
-                                            <img class="self-stretch" src="https://placehold.co/212x299" />
-                                            <p class="p-style-small mt-6">
-                                                Bert Hardy RAF Men Poster A2
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="embla__slide">
-                                        <div class="">
-                                            <img class="self-stretch" src="https://placehold.co/212x299" />
-                                            <p class="p-style-small mt-6">
-                                                Bert Hardy RAF Men Poster A2
-                                            </p>
-                                        </div>
-                                    </div>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>
 
                     </section>
-
                 <?php endif; ?>
+
             <?php endwhile; ?>
         </div>
 
-        <?php if (em_is_event_page()): ?>
-            <?php if ($events_length > 0): ?>
-                <div class="col-span-4 mt-24">
-                    <a href=" <?= get_page_link(15); ?>" class="block">
-                        <h1 class="hover:underline decoration-2 h1-style leading-none">
-                            Upcoming talks
-                        </h1>
-                    </a>
-                    <p class="p-style-light w-[60%] text-wrap mt-2">
-                        Discover what talks, events and workshops we have coming up, online and in-person.
-                    </p>
-                </div>
-                <div class="grid-cols-subgrid grid col-span-12">
 
-                    <?php for ($i = 0; $i < $events_length; $i++): ?>
-                        <div class="grid grid-cols-subgrid col-span-4">
-                            <!-- image -->
-                            <div
-                                class="group relative col-span-4 aspect-[4.5/4] overflow-hidden [&_img]:w-full [&_img]:h-full [&_img]:object-cover">
-                                <a href="<?= $event_urls[$i]; ?>" class="absolute inset-0 z-10"></a>
-                                <?= $event_images[$i]; ?>
-                                <!-- Bottom-right badge -->
-                                <div
-                                    class="group-hover:invert transition duration-300 absolute leading-none text-left bottom-4 right-4 outline w-48 p-2 bg-white text-black h4-style font-medium">
-                                    <?= $event_tags[$i]; ?>
-                                </div>
-                            </div>
+        <!-- ============================================
+             RELATED EVENTS SECTION (Events Only)
+             ============================================ -->
 
-                            <div class="col-span-3 flex-col justify-between items-start inline-flex mt-6 h-[148px]">
-                                <a href="<?= $event_urls[$i] ?>" class="block">
-                                    <h1 class="h2-style leading-none justify-start hover:underline">
-                                        <?= $trimmed_names[$i] ?>
+        <?php if ($is_event && $related_count > 0): ?>
 
-                                    </h1>
-                                </a>
+            <!-- Section Header -->
+            <div class="col-span-4 mt-24">
+                <a href="<?= get_page_link(PAGE_ID_TALKS) ?>" class="block">
+                    <h1 class="hover:underline decoration-2 h1-style leading-none">
+                        Upcoming talks
+                    </h1>
+                </a>
+                <p class="p-style-light w-[60%] text-wrap mt-2">
+                    Discover what talks, events and workshops we have coming up, online and in-person.
+                </p>
+            </div>
 
-                                <div class="justify-start">
-                                    <p class="h3-style">
-                                        <?= $event_instructors[$i] ?>
-                                    </p>
-                                    <p class="h4-style">
-                                        <?= $event_dates[$i] ?>
-                                    </p>
-                                </div>
+            <!-- Related Events Grid -->
+            <div class="grid-cols-subgrid grid col-span-12">
 
-                            </div>
-                            <div class="col-span-1 mt-6">
-                                <a href="<?= $event_tickets[$i] ?>" class="link inline-flex items-center gap-2"> Tickets
-                                    <svg class="w-auto relative inline-block h-[0.7em] top-[0.1em]" width="11" height="11"
-                                        viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M0.21967 9.21967C-0.0732233 9.51256 -0.0732233 9.98744 0.21967 10.2803C0.512563 10.5732 0.987437 10.5732 1.28033 10.2803L0.75 9.75L0.21967 9.21967ZM10.5 0.749999C10.5 0.335786 10.1642 -7.69011e-07 9.75 -6.04039e-07L3 -7.41016e-07C2.58579 -7.23559e-07 2.25 0.335786 2.25 0.749999C2.25 1.16421 2.58579 1.5 3 1.5L9 1.5L9 7.5C9 7.91421 9.33579 8.25 9.75 8.25C10.1642 8.25 10.5 7.91421 10.5 7.5L10.5 0.749999ZM0.75 9.75L1.28033 10.2803L10.2803 1.28033L9.75 0.749999L9.21967 0.219669L0.21967 9.21967L0.75 9.75Z"
-                                            fill="black" />
-                                    </svg>
-                                </a>
+                <?php foreach ($related_events as $related): ?>
+                    <div class="grid grid-cols-subgrid col-span-4">
+
+                        <!-- Event Image -->
+                        <div class="
+                            group relative col-span-4
+                            aspect-[4.5/4] overflow-hidden
+                            [&_img]:w-full [&_img]:h-full [&_img]:object-cover
+                        ">
+                            <a href="<?= esc_url($related['url']) ?>" class="absolute inset-0 z-10"></a>
+                            <?= $related['image'] ?>
+
+                            <div class="
+                                group-hover:invert transition duration-300
+                                absolute bottom-4 right-4
+                                outline w-48 p-2
+                                bg-white text-black
+                                h4-style font-medium leading-none text-left
+                            ">
+                                <?= $related['tag'] ?>
                             </div>
                         </div>
-                    <?php endfor; ?>
-                    <div class="col-span-4">
-                        <div class="w-[60%] flex-col inline-flex item-start justify-start">
+
+                        <!-- Event Info -->
+                        <div class="col-span-3 flex-col justify-between items-start inline-flex mt-6 h-[148px]">
+                            <a href="<?= esc_url($related['url']) ?>" class="block">
+                                <h1 class="h2-style leading-none hover:underline">
+                                    <?= esc_html($related['name']) ?>
+                                </h1>
+                            </a>
                             <div>
-                                <a href="">
-                                    <h2 class="h2-style hover:underline leading-snug">Our Speakers</h2>
-                                </a>
-                                <p class="p-style mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing
-                                    elit. Aenean laoreet,</p>
+                                <p class="h3-style"><?= esc_html($related['instructor']) ?></p>
+                                <p class="h4-style"><?= esc_html($related['date']) ?></p>
                             </div>
-                            <div class="mt-6">
-                                <a href="">
-                                    <h2 class="h2-style hover:underline leading-snug">Our Archive</h2>
-                                </a>
-                                <p class="p-style mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing
-                                    elit. Aenean laoreet,</p>
-                            </div>
+                        </div>
+
+                        <!-- Ticket Link -->
+                        <div class="col-span-1 mt-6">
+                            <?= ticket_link($related['ticket_url'], '') ?>
+                        </div>
+
+                    </div>
+                <?php endforeach; ?>
+
+                <!-- Sidebar Links -->
+                <div class="col-span-4">
+                    <div class="w-[60%] flex-col inline-flex item-start justify-start">
+                        <div>
+                            <a href="">
+                                <h2 class="h2-style hover:underline leading-snug">Our Speakers</h2>
+                            </a>
+                            <p class="p-style mt-2">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean laoreet,
+                            </p>
+                        </div>
+                        <div class="mt-6">
+                            <a href="">
+                                <h2 class="h2-style hover:underline leading-snug">Our Archive</h2>
+                            </a>
+                            <p class="p-style mt-2">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean laoreet,
+                            </p>
                         </div>
                     </div>
                 </div>
-            <?php endif; ?>
+
+            </div>
+
         <?php endif; ?>
+
     </div>
 </div>
-
-
 
 <?php get_footer(); ?>

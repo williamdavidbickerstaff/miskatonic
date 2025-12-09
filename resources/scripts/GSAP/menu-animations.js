@@ -1,90 +1,118 @@
-function detectDarkModeFromElement(el) {
+/**
+ * Menu hover animations
+ * Handles background highlight and text color changes on menu items
+ */
+
+import { TIMING, EASE, SELECTORS } from "./config.js";
+
+const DARK_CLASSES = ["theme-dark", "dark", "is-dark"];
+const LIGHT_CLASSES = ["theme-light", "light", "is-light"];
+
+/**
+ * Detect if element is in dark mode context
+ * @param {Element} el - Element to check
+ * @returns {boolean} True if dark mode
+ */
+function isDarkMode(el) {
     if (!el) return false;
 
-    // 1) data-theme on element
-    const dataTheme = el.getAttribute && el.getAttribute('data-theme');
-    if (dataTheme) return dataTheme === 'dark';
+    // Check data-theme attribute
+    const dataTheme = el.getAttribute?.("data-theme");
+    if (dataTheme) return dataTheme === "dark";
 
-    // 2) explicit classes on element
-    const elClassList = el.classList || [];
-    if (elClassList.contains && (elClassList.contains('theme-dark') || elClassList.contains('dark') || elClassList.contains('is-dark'))) return true;
-    if (elClassList.contains && (elClassList.contains('theme-light') || elClassList.contains('light') || elClassList.contains('is-light'))) return false;
+    // Check element classes
+    if (DARK_CLASSES.some((cls) => el.classList?.contains(cls))) return true;
+    if (LIGHT_CLASSES.some((cls) => el.classList?.contains(cls))) return false;
 
-    // 3) closest ancestor with data-theme or classes
-    const anc = el.closest && el.closest('[data-theme], .theme-dark, .theme-light, .dark, .light, .is-dark, .is-light');
-    if (anc) {
-        const ancData = anc.getAttribute && anc.getAttribute('data-theme');
-        if (ancData) return ancData === 'dark';
-        const acl = anc.classList || [];
-        if (acl.contains && (acl.contains('theme-dark') || acl.contains('dark') || acl.contains('is-dark'))) return true;
-        if (acl.contains && (acl.contains('theme-light') || acl.contains('light') || acl.contains('is-light'))) return false;
+    // Check ancestors
+    const ancestor = el.closest?.(
+        "[data-theme], .theme-dark, .theme-light, .dark, .light, .is-dark, .is-light"
+    );
+    if (ancestor) {
+        const ancTheme = ancestor.getAttribute?.("data-theme");
+        if (ancTheme) return ancTheme === "dark";
+        if (DARK_CLASSES.some((cls) => ancestor.classList?.contains(cls)))
+            return true;
+        if (LIGHT_CLASSES.some((cls) => ancestor.classList?.contains(cls)))
+            return false;
     }
 
-    // 4) fallback to body data-theme or global var
-    const bodyTheme = document.body && document.body.getAttribute && document.body.getAttribute('data-theme');
-    if (bodyTheme) return bodyTheme === 'dark';
+    // Fallback to body or global
+    const bodyTheme = document.body?.getAttribute?.("data-theme");
+    if (bodyTheme) return bodyTheme === "dark";
 
-    if (typeof window !== 'undefined' && window.menuColorScheme) return window.menuColorScheme === 'dark';
-
-    return false;
+    return window.menuColorScheme === "dark";
 }
 
+/**
+ * Get menu colors based on theme
+ * @param {Element} el - Element to check theme for
+ * @returns {Object} Color configuration
+ */
 function getMenuColors(el) {
-    const isDarkMode = detectDarkModeFromElement(el);
+    const dark = isDarkMode(el);
     return {
-        textColor: isDarkMode ? "rgba(255, 255, 255, 0.8)" : "rgba(0, 0, 0, 0.8)",
-        textHoverColor: isDarkMode ? "rgba(255, 255, 255, 1)" : "rgba(0, 0, 0, 1)",
-        bgColor: isDarkMode ? "rgba(255, 255, 255)" : "rgba(0, 0, 0)",
+        text: dark ? "rgba(255, 255, 255, 0.8)" : "rgba(0, 0, 0, 0.8)",
+        textHover: dark ? "rgba(255, 255, 255, 1)" : "rgba(0, 0, 0, 1)",
+        bg: dark ? "rgba(255, 255, 255)" : "rgba(0, 0, 0)",
     };
 }
 
+/**
+ * Create background element for menu item
+ * @param {string} bgColor - Background color
+ * @returns {HTMLDivElement} Background element
+ */
+function createMenuBackground(bgColor) {
+    const bg = document.createElement("div");
+    bg.className = "menu-bg";
+    Object.assign(bg.style, {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        width: "100%",
+        height: "100%",
+        backgroundColor: bgColor,
+        opacity: "0",
+    });
+    return bg;
+}
+
+/**
+ * Initialize menu item hover animations
+ */
 export function initMenuAnimations() {
-    const menuItems = document.querySelectorAll("[data-menu-item]");
+    const menuItems = document.querySelectorAll(SELECTORS.menuItem);
 
     menuItems.forEach((item) => {
-        // Compute colors per-item based on its classes/data attributes/ancestors
         const colors = getMenuColors(item);
+        const bg = createMenuBackground(colors.bg);
+        const label = item.querySelector("label");
 
-        const bg = document.createElement("div");
-        bg.classList.add("menu-bg");
-        bg.style.position = "absolute";
-        bg.style.top = "0";
-        bg.style.left = "0";
-        bg.style.width = "100%";
-        bg.style.height = "100%";
-        bg.style.backgroundColor = colors.bgColor;
-        bg.style.opacity = "0";
         item.style.position = "relative";
         item.insertBefore(bg, item.firstChild);
 
-        const label = item.querySelector("label");
-        gsap.set(label, {
-            color: colors.textColor,
-        });
+        gsap.set(label, { color: colors.text });
 
         item.addEventListener("mouseenter", () => {
             gsap.to(bg, {
                 opacity: 0.3,
-                duration: 0.3,
-                ease: "power2.out",
+                duration: TIMING.normal,
+                ease: EASE.out,
             });
             gsap.to(label, {
-                color: colors.textHoverColor,
-                duration: 0.3,
-                ease: "power2.out",
+                color: colors.textHover,
+                duration: TIMING.normal,
+                ease: EASE.out,
             });
         });
 
         item.addEventListener("mouseleave", () => {
-            gsap.to(bg, {
-                opacity: 0,
-                duration: 0.3,
-                ease: "power2.in",
-            });
+            gsap.to(bg, { opacity: 0, duration: TIMING.normal, ease: EASE.in });
             gsap.to(label, {
-                color: colors.textColor,
-                duration: 0.3,
-                ease: "power2.out",
+                color: colors.text,
+                duration: TIMING.normal,
+                ease: EASE.out,
             });
         });
     });

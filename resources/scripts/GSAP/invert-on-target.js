@@ -1,33 +1,48 @@
+/**
+ * Invert filter animation targeting a child element
+ * Hover on parent, effect applies to .invert-target child
+ */
+
+import { EASE } from "./config.js";
+
+const INVERT_DURATION = 0.22;
+
+/**
+ * Initialize invert effect on child target when parent is hovered
+ * @param {string} selector - CSS selector for parent elements
+ */
 export function initInvertOnTarget(selector = ".invert-on-hover") {
-    const gsapRef = window.gsap || (typeof gsap !== "undefined" && gsap);
-    if (!gsapRef) return;
+    if (typeof gsap === "undefined") return;
 
     document.querySelectorAll(selector).forEach((parent) => {
-        // find the child we actually want to affect
         const target = parent.querySelector(".invert-target");
         if (!target) return;
 
         target.style.willChange = "filter, opacity";
 
         const enter = () =>
-            gsapRef.to(target, {
+            gsap.to(target, {
                 filter: "invert(1) grayscale(1)",
-                duration: 0.22,
-                ease: "power1.out",
+                duration: INVERT_DURATION,
+                ease: EASE.smooth,
             });
 
         const leave = () =>
-            gsapRef.to(target, {
+            gsap.to(target, {
                 filter: "invert(0) grayscale(0)",
-                duration: 0.22,
-                ease: "power1.out",
+                duration: INVERT_DURATION,
+                ease: EASE.smooth,
             });
 
+        // Mouse events on parent
         parent.addEventListener("mouseenter", enter);
         parent.addEventListener("mouseleave", leave);
+
+        // Keyboard accessibility
         parent.addEventListener("focusin", enter);
         parent.addEventListener("focusout", leave);
 
+        // Cleanup hook
         parent._invertOnHoverCleanup = () => {
             parent.removeEventListener("mouseenter", enter);
             parent.removeEventListener("mouseleave", leave);

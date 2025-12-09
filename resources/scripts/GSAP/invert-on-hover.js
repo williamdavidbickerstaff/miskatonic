@@ -1,33 +1,45 @@
+/**
+ * Invert filter animation on hover
+ * Creates a dramatic invert + grayscale effect for images/elements
+ */
+
+import { EASE } from "./config.js";
+
+const INVERT_DURATION = 0.22;
+
+/**
+ * Initialize invert-on-hover effect for selected elements
+ * @param {string} selector - CSS selector for target elements
+ */
 export function initInvertOnHover(selector = ".invert-on-hover") {
-    const gsapRef = window.gsap || (typeof gsap !== "undefined" && gsap);
-    if (!gsapRef) return;
+    if (typeof gsap === "undefined") return;
 
     document.querySelectorAll(selector).forEach((el) => {
-        // make the browser aware we'll animate filter
         el.style.willChange = "filter, opacity";
 
         const enter = () =>
-            gsapRef.to(el, {
+            gsap.to(el, {
                 filter: "invert(1) grayscale(1)",
-                duration: 0.22,
-                ease: "power1.out",
+                duration: INVERT_DURATION,
+                ease: EASE.smooth,
             });
 
         const leave = () =>
-            gsapRef.to(el, {
+            gsap.to(el, {
                 filter: "invert(0) grayscale(0)",
-                duration: 0.22,
-                ease: "power1.out",
+                duration: INVERT_DURATION,
+                ease: EASE.smooth,
             });
 
+        // Mouse events
         el.addEventListener("mouseenter", enter);
         el.addEventListener("mouseleave", leave);
 
-        // optional: support keyboard focus
+        // Keyboard accessibility
         el.addEventListener("focusin", enter);
         el.addEventListener("focusout", leave);
 
-        // clean up hook (if you ever remove node)
+        // Cleanup hook for dynamic removal
         el._invertOnHoverCleanup = () => {
             el.removeEventListener("mouseenter", enter);
             el.removeEventListener("mouseleave", leave);
