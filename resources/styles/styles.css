@@ -15,8 +15,8 @@ html {
     overflow: visible;
     margin: auto;
     --slide-height: 19rem;
-    --slide-spacing: 2rem;
-    --slide-size: 33%;
+    --slide-spacing: 1.5rem;
+    --slide-size: 33.33333%;
 }
 
 .embla__viewport {

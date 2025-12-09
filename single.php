@@ -14,7 +14,10 @@ add_filter('body_class', 'my_plugin_body_class');
 get_header();
 
 if (em_is_event_page()):
+    // SINGLE EVENT INFO
     $event = em_get_event(get_the_ID(), 'post_id');
+    $current_event_id = $event->event_id;
+
     $image = $event->output('#_EVENTIMAGE{medium}');
     $tags = $event->output('#_EVENTTAGS');
     $speaker = $event->output('#_CATEGORYNAME');
@@ -22,6 +25,58 @@ if (em_is_event_page()):
     $paylink = $event->output('#_ATT{paylink}');
     $ticket_price = $event->output('#_ATT{admission}');
     $watchlist = $event->output('#_ATT{watchlist}');
+    $event_status = ($event->start()->getTimestamp() <= current_time('timestamp')) ? 'ended' : 'active';
+
+    //EVENT LIST INFO
+    if (class_exists('EM_Events')) {
+        $other_events = EM_Events::get(array(
+            'limit' => 3,
+            'orderby' => 'date'
+        ));
+
+        if (isset($other_events)) {
+            $other_events = array_filter($other_events, function ($evt) use ($current_event_id) {
+                return $evt->event_id !== $current_event_id;
+            });
+            $other_events = array_values($other_events);
+            $other_events = array_slice($other_events, 0, 2);
+        }
+        $events_length = count($other_events);
+    }
+    // events
+    $trimmed_names = [];
+    $event_images = [];
+    $event_instructors = [];
+    $event_dates = [];
+    $event_urls = [];
+    $event_tickets = [];
+    $event_tags = [];
+
+    foreach ($other_events as $other_event) {
+
+        #event name
+        $event_name = $other_event->event_name;
+        $words = explode(' ', $event_name);
+        array_pop($words);
+        $trimmed_name = implode(' ', $words);
+
+        $event_image = $other_event->output('#_EVENTIMAGE{medium}');
+        $event_date = $other_event->output('#_EVENTSTARTDATE');
+        $event_instructor = $other_event->output('#_CATEGORYNAME');
+        $event_url = $other_event->output('#_EVENTURL');
+        $event_ticket = $other_event->output('#_ATT{paylink}');
+        $event_tag = $other_event->output('#_EVENTTAGS');
+
+        $trimmed_names[] = $trimmed_name;
+        $event_images[] = $event_image;
+
+        $event_dates[] = $event_date;
+        $event_instructors[] = $event_instructor;
+        $event_urls[] = $event_url;
+        $event_tickets[] = $event_ticket;
+        $event_tags[] = $event_tag;
+    }
+
 endif;
 ?>
 
@@ -70,10 +125,12 @@ endif;
                     <div class="col-span-8 mt-6 relative [&_img]:w-full [&_img]:h-full [&_img]:object-cover">
                         <?= $image; ?>
                         <!-- Bottom-right badge -->
-                        <div
-                            class="absolute leading-none text-left bottom-4 right-4 outline w-48 p-2 bg-black text-white h4-style font-medium invert">
-                            <?= $tags; ?>
-                        </div>
+                        <?php if ($tags !== ''): ?>
+                            <div
+                                class="absolute leading-none text-left bottom-4 right-4 outline w-48 p-2 bg-black text-white h4-style font-medium invert">
+                                <?= $tags; ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
 
@@ -120,6 +177,8 @@ endif;
                             <div>
                                 <h2 class="h2-style">
                                     Admission
+
+                                    <?= $event->condition == 'is_past'; ?>
                                 </h2>
                                 <p class="p-style-small">
                                     Zoom registration links for each class are included in your order confirmation email from
@@ -129,49 +188,48 @@ endif;
                             </div>
                         </div>
                         <!-- right text -->
-                        <div class="col-span-3 justify-start flex flex-col gap-6">
-                            <a href="<?php echo $paylink; ?>" class="block">
-                                <div
-                                    class="
-                            bg-white outline outline-offset-[-1px] p-2.5 flex justify-between items-center invert-on-hover">
-                                    <div class="justify-start p-style-small-medium">
-                                        Individual Ticket
-                                        <?= miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em]"'); ?>
-                                    </div>
-                                    <div class="p-style-small-medium">
-                                        <?php echo $ticket_price; ?>
-                                    </div>
-                                </div>
-                            </a>
-                            <div
-                                class="
-                            bg-white outline outline-offset-[-1px] p-2.5 flex justify-between items-center invert-on-hover">
-                                <div class="justify-start p-style-small-medium">
-                                    Online Semester Pass
-                                    <?= miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em]"'); ?>
-                                </div>
-                                <div class="p-style-small-medium">
-                                    £10
-                                </div>
-                            </div>
-                            <?php
-                            if ($watchlist):
-                                ?>
-                                <a href="<?php echo $watchlist ?>" class="block">
+                        <?php if ($event_status == 'active'): ?>
+                            <div class="col-span-3 justify-start flex flex-col gap-6">
+                                <a href="<?php echo $paylink; ?>" class="block">
                                     <div
                                         class="
                             bg-white outline outline-offset-[-1px] p-2.5 flex justify-between items-center invert-on-hover">
                                         <div class="justify-start p-style-small-medium">
-                                            Watchlist
+                                            Individual Ticket
                                             <?= miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em]"'); ?>
                                         </div>
                                         <div class="p-style-small-medium">
-                                            £10
+                                            <?php echo $ticket_price; ?>
                                         </div>
                                     </div>
                                 </a>
-                            <?php endif; ?>
-                        </div>
+                                <div
+                                    class="
+                            bg-white outline outline-offset-[-1px] p-2.5 flex justify-between items-center invert-on-hover">
+                                    <div class="justify-start p-style-small-medium">
+                                        Online Semester Pass
+                                        <?= miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em]"'); ?>
+                                    </div>
+                                    <div class="p-style-small-medium">
+                                        £10
+                                    </div>
+                                </div>
+                                <?php
+                                if ($watchlist):
+                                    ?>
+                                    <a href="<?php echo $watchlist ?>" class="block">
+                                        <div
+                                            class="
+                            bg-white outline outline-offset-[-1px] p-2.5 flex justify-between items-center invert-on-hover">
+                                            <div class="justify-start p-style-small-medium">
+                                                Watchlist
+                                                <?= miskatonic_svg_ticket('class="w-auto relative inline-block h-[0.7em]"'); ?>
+                                            </div>
+                                        </div>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
 
@@ -182,11 +240,11 @@ endif;
 
 
                 <!-- Merch section !-->
-                <?php if (em_is_event_page()): ?>
+                <?php if (em_is_event_page() && $event_status == 'active'): ?>
 
                     <section class="embla col-span-6 grid grid-cols-subgrid">
 
-                        <div class="col-span-6 mt-24 flex items-center justify-between">
+                        <div class="col-span-6 mt-6 flex items-center justify-between">
                             <h1 class="h1-style">
                                 On sale at our talks
                             </h1>
@@ -290,6 +348,86 @@ endif;
                 <?php endif; ?>
             <?php endwhile; ?>
         </div>
+
+        <?php if (em_is_event_page()): ?>
+            <?php if ($events_length > 0): ?>
+                <div class="col-span-4 mt-24">
+                    <a href=" <?= get_page_link(15); ?>" class="block">
+                        <h1 class="hover:underline decoration-2 h1-style leading-none">
+                            Upcoming talks
+                        </h1>
+                    </a>
+                    <p class="p-style-light w-[60%] text-wrap mt-2">
+                        Discover what talks, events and workshops we have coming up, online and in-person.
+                    </p>
+                </div>
+                <div class="grid-cols-subgrid grid col-span-12">
+
+                    <?php for ($i = 0; $i < $events_length; $i++): ?>
+                        <div class="grid grid-cols-subgrid col-span-4">
+                            <!-- image -->
+                            <div
+                                class="group relative col-span-4 aspect-[4.5/4] overflow-hidden [&_img]:w-full [&_img]:h-full [&_img]:object-cover">
+                                <a href="<?= $event_urls[$i]; ?>" class="absolute inset-0 z-10"></a>
+                                <?= $event_images[$i]; ?>
+                                <!-- Bottom-right badge -->
+                                <div
+                                    class="group-hover:invert transition duration-300 absolute leading-none text-left bottom-4 right-4 outline w-48 p-2 bg-white text-black h4-style font-medium">
+                                    <?= $event_tags[$i]; ?>
+                                </div>
+                            </div>
+
+                            <div class="col-span-3 flex-col justify-between items-start inline-flex mt-6 h-[148px]">
+                                <a href="<?= $event_urls[$i] ?>" class="block">
+                                    <h1 class="h2-style leading-none justify-start hover:underline">
+                                        <?= $trimmed_names[$i] ?>
+
+                                    </h1>
+                                </a>
+
+                                <div class="justify-start">
+                                    <p class="h3-style">
+                                        <?= $event_instructors[$i] ?>
+                                    </p>
+                                    <p class="h4-style">
+                                        <?= $event_dates[$i] ?>
+                                    </p>
+                                </div>
+
+                            </div>
+                            <div class="col-span-1 mt-6">
+                                <a href="<?= $event_tickets[$i] ?>" class="link inline-flex items-center gap-2"> Tickets
+                                    <svg class="w-auto relative inline-block h-[0.7em] top-[0.1em]" width="11" height="11"
+                                        viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M0.21967 9.21967C-0.0732233 9.51256 -0.0732233 9.98744 0.21967 10.2803C0.512563 10.5732 0.987437 10.5732 1.28033 10.2803L0.75 9.75L0.21967 9.21967ZM10.5 0.749999C10.5 0.335786 10.1642 -7.69011e-07 9.75 -6.04039e-07L3 -7.41016e-07C2.58579 -7.23559e-07 2.25 0.335786 2.25 0.749999C2.25 1.16421 2.58579 1.5 3 1.5L9 1.5L9 7.5C9 7.91421 9.33579 8.25 9.75 8.25C10.1642 8.25 10.5 7.91421 10.5 7.5L10.5 0.749999ZM0.75 9.75L1.28033 10.2803L10.2803 1.28033L9.75 0.749999L9.21967 0.219669L0.21967 9.21967L0.75 9.75Z"
+                                            fill="black" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    <?php endfor; ?>
+                    <div class="col-span-4">
+                        <div class="w-[60%] flex-col inline-flex item-start justify-start">
+                            <div>
+                                <a href="">
+                                    <h2 class="h2-style hover:underline leading-snug">Our Speakers</h2>
+                                </a>
+                                <p class="p-style mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing
+                                    elit. Aenean laoreet,</p>
+                            </div>
+                            <div class="mt-6">
+                                <a href="">
+                                    <h2 class="h2-style hover:underline leading-snug">Our Archive</h2>
+                                </a>
+                                <p class="p-style mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing
+                                    elit. Aenean laoreet,</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
     </div>
 </div>
 

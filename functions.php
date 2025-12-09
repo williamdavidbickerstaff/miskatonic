@@ -82,6 +82,7 @@ function insert_navbar($attrs = '')
 {
     $talks_link = get_page_link(15);
     $news_link = get_page_link(2603);
+    $archive_link = get_page_link(252);
 
     return
         '
@@ -93,10 +94,12 @@ function insert_navbar($attrs = '')
             </a>
             <li class="h-full h2-style leading-none menu-item" data-menu-item>
                 <label class="h-full flex items-center justify-start">Speakers</label>
-            </li>
-            <li class="h-full h2-style leading-none menu-item" data-menu-item>
-                <label class="h-full flex items-center justify-start">Archive</label>
-            </li>
+            </li>      
+            <a href="' . $archive_link . '" class="block">
+                <li class="h-full h2-style leading-none menu-item" data-menu-item>
+                    <label class="h-full flex items-center justify-start">Archive</label>
+                </li>
+            </a>
             <a href="' . $news_link . '" class="block">
                 <li class="h-full h2-style leading-none menu-item" data-menu-item>
                     <label class="h-full flex items-center justify-start">News</label>

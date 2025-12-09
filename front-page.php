@@ -130,7 +130,7 @@ if (class_exists('EM_Events')) {
 
             <?php if ($events_length > 0): ?>
 
-                <div class="col-span-8 mt-6">
+                <div class="col-span-8 grid grid-cols-subgrid mt-6">
                     <div class="group col-span-8 relative [&_img]:w-full [&_img]:h-full [&_img]:object-cover">
                         <a href="<?= $event_urls[0]; ?>" class="absolute inset-0 z-10"></a>
                         <?= $event_images[0]; ?>
@@ -140,42 +140,44 @@ if (class_exists('EM_Events')) {
                             <?= $event_tags[0]; ?>
                         </div>
                     </div>
-                </div>
+                    <!-- info box -->
+                    <div class="col-span-4 grid grid-cols-subgrid h-[148px] mt-6">
 
-                <!-- info box -->
-                <div class="col-span-4 grid grid-cols-subgrid h-[148px] mt-6">
-
-                    <!-- left text -->
-                    <div class="flex-col justify-between items-start inline-flex col-span-3">
-                        <a href="<?= $event_urls[0] ?>" class="block">
-                            <h2 class="text-white h2-style leading-none justify-start hover:underline">
-                                <?php echo esc_html('' . $trimmed_names[0] . ''); ?>
-                            </h2>
-                        </a>
-                        <!-- bottom left text  -->
-                        <div class="justify-start">
-                            <p class="text-white h3-style">
-                                <?php echo $event_instructors[0] ?>
-                            </p>
-                            <p class="text-white h4-style">
-                                <?php echo $event_dates[0] ?>
-                            </p>
+                        <!-- left text -->
+                        <div class="flex-col justify-between items-start inline-flex col-span-3">
+                            <a href="<?= $event_urls[0] ?>" class="block">
+                                <h2 class="text-white h2-style leading-none justify-start hover:underline">
+                                    <?php echo esc_html('' . $trimmed_names[0] . ''); ?>
+                                </h2>
+                            </a>
+                            <!-- bottom left text  -->
+                            <div class="justify-start">
+                                <p class="text-white h3-style">
+                                    <?php echo $event_instructors[0] ?>
+                                </p>
+                                <p class="text-white h4-style">
+                                    <?php echo $event_dates[0] ?>
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- right text -->
-                    <div class="col-span-1">
-                        <a href="<?= $event_tickets[0] ?>" class="text-white link inline-flex items-center gap-2"> Tickets
-                            <svg class="w-auto relative inline-block h-[0.7em] top-[0.1em]" width="11" height="11"
-                                viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M0.21967 9.21967C-0.0732233 9.51256 -0.0732233 9.98744 0.21967 10.2803C0.512563 10.5732 0.987437 10.5732 1.28033 10.2803L0.75 9.75L0.21967 9.21967ZM10.5 0.749999C10.5 0.335786 10.1642 -7.69011e-07 9.75 -6.04039e-07L3 -7.41016e-07C2.58579 -7.23559e-07 2.25 0.335786 2.25 0.749999C2.25 1.16421 2.58579 1.5 3 1.5L9 1.5L9 7.5C9 7.91421 9.33579 8.25 9.75 8.25C10.1642 8.25 10.5 7.91421 10.5 7.5L10.5 0.749999ZM0.75 9.75L1.28033 10.2803L10.2803 1.28033L9.75 0.749999L9.21967 0.219669L0.21967 9.21967L0.75 9.75Z"
-                                    fill="white" />
-                            </svg>
-                        </a>
-                    </div>
+                        <!-- right text -->
+                        <div class="col-span-1">
+                            <a href="<?= $event_tickets[0] ?>" class="text-white link inline-flex items-center gap-2">
+                                Tickets
+                                <svg class="w-auto relative inline-block h-[0.7em] top-[0.1em]" width="11" height="11"
+                                    viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M0.21967 9.21967C-0.0732233 9.51256 -0.0732233 9.98744 0.21967 10.2803C0.512563 10.5732 0.987437 10.5732 1.28033 10.2803L0.75 9.75L0.21967 9.21967ZM10.5 0.749999C10.5 0.335786 10.1642 -7.69011e-07 9.75 -6.04039e-07L3 -7.41016e-07C2.58579 -7.23559e-07 2.25 0.335786 2.25 0.749999C2.25 1.16421 2.58579 1.5 3 1.5L9 1.5L9 7.5C9 7.91421 9.33579 8.25 9.75 8.25C10.1642 8.25 10.5 7.91421 10.5 7.5L10.5 0.749999ZM0.75 9.75L1.28033 10.2803L10.2803 1.28033L9.75 0.749999L9.21967 0.219669L0.21967 9.21967L0.75 9.75Z"
+                                        fill="white" />
+                                </svg>
+                            </a>
+                        </div>
 
+                    </div>
                 </div>
+
+
 
             <?php endif; ?>
 
@@ -291,7 +293,10 @@ if (class_exists('EM_Events')) {
         </div>
     </div>
 
-    <!--
+</div>
+
+
+<!--
     ################################
     ||                            ||
     ||    Recent News Section     ||
@@ -299,9 +304,9 @@ if (class_exists('EM_Events')) {
     ################################
     -->
 
-    <?php if ($news_length > 0): ?>
-
-        <div class="grid grid-cols-12 gap-6 mt-6 p-6 bg-stone-900">
+<?php if ($news_length > 0): ?>
+    <div class="w-screen bg-stone-900 text-white">
+        <div class="mx-auto max-w-[1440px] grid grid-cols-12 gap-6 mt-6 p-6">
             <div class="col-span-4">
                 <a href=" <?= get_page_link(2603); ?>" class="block">
                     <h1 class="hover:underline decoration-2 h1-style text-white leading-none">
@@ -314,79 +319,75 @@ if (class_exists('EM_Events')) {
             </div>
 
             <div class="grid grid-cols-subgrid gap-6 col-span-12">
-
-                <?php $test = true;
-                if ($test == true): ?>
-                    <?php for ($i = 0; $i < $news_length; $i++): ?>
-                        <div class="grid grid-cols-subgrid 
+                <?php for ($i = 0; $i < $news_length; $i++): ?>
+                    <div class="group
+                    <?php if ($i >= 1) {
+                        echo "col-span-4";
+                    } ?>
                     <?php if ($i == 0) {
                         echo "col-span-8";
-                    }
-                    ; ?>
-                    <?php if ($i > 0) {
-                        echo "col-span-4";
-                    }
-                    ; ?>">
-
-                            <div class="relative overflow-hidden [&_img]:w-full [&_img]:h-full [&_img]:object-cover
-                            <?php if ($i == 0) {
-                                echo "col-span-8 aspect-[7/4]";
-                            }
-                            ; ?>
-                            <?php if ($i > 0) {
-                                echo "col-span-4 aspect-[4.5/4]";
-                            }
-                            ; ?>
+                    } ?>
+                    ">
+                        <a href="<?= $news_urls[$i] ?>" clas="block">
+                            <div class="overflow-hidden [&_img]:w-full [&_img]:h-full [&_img]:object-cover w-full
+                            
+                            <?php if ($i >= 1) {
+                                echo "aspect-[4.5/4]";
+                            } ?>
                             ">
-                                <a href="<?= $news_urls[$i]; ?>" class="absolute inset-0 z-10"></a>
-                                <?php echo $news_thumbnails[$i] ?>
+                                <?= $news_thumbnails[$i] ?>
                             </div>
-
-                            <div class="mt-6 col-span-4
-                                ">
-                                <a href="<?= $news_urls[$i] ?>" class="block">
-                                    <h2 class="h2-style text-white leading-none">
-                                        <?php echo $news_titles[$i] ?>
-                                    </h2>
-                                </a>
-
-                                <p class="p-style-light text-white mt-2">
-                                    <?php echo $news_contents[$i] ?>
+                        </a>
+                        <div class="mt-6
+                        <?php if ($i == 0) {
+                            echo "w-1/2";
+                        } ?>
+                        ">
+                            <a href="<?= $news_urls[$i] ?>" class="block">
+                                <h2 class="h2-style group-hover:underline">
+                                    <?= $news_titles[$i] ?>
+                                </h2>
+                                <p class="p-style">
+                                    <?= $news_contents[$i] ?>
                                 </p>
-                            </div>
+                            </a>
                         </div>
-                    <?php endfor; ?>
-                </div>
+                    </div>
+                <?php endfor; ?>
             </div>
-        <?php endif; ?>
-    <?php endif; ?>
+        </div>
+    </div>
 
-    <!--
+<?php endif; ?>
+
+
+<!--
     ################################
     ||                            ||
     ||          About us          ||
     ||                            ||
     ################################
     -->
-    <div class="col-span-12 p-6 relative">
-        <div class="relative w-full aspect-[10/4] overflow-hidden">
-            <!-- Background image -->
-            <img src="/wp-content/uploads/2022/08/horse_hospital.jpeg" alt="The Horse Hospital"
-                class="w-full h-full object-cover" />
 
-            <!-- Gradient overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+<div class="max-w-[1440px] mx-auto p-6 relative">
+    <div class="relative w-full aspect-[10/4] overflow-hidden">
+        <!-- Background image -->
+        <img src="/wp-content/uploads/2022/08/horse_hospital.jpeg" alt="The Horse Hospital"
+            class="w-full h-full object-cover" />
 
-            <!-- Text overlay -->
-            <div class="absolute bottom-6 left-6 text-white max-w-[20%]">
-                <h2 class="h1-style text-white mb-2">About us</h2>
-                <p class="p-style-light">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam tempus lectus sed lectus
-                    finibus.
-                </p>
-            </div>
+        <!-- Gradient overlay -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+
+        <!-- Text overlay -->
+        <div class="absolute bottom-6 left-6 text-white max-w-[20%]">
+            <h2 class="h1-style text-white mb-2">About us</h2>
+            <p class="p-style-light">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam tempus lectus sed lectus
+                finibus.
+            </p>
         </div>
     </div>
+</div>
 </div>
 
 <?php get_footer(); ?>

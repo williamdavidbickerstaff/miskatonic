@@ -18,18 +18,21 @@ $recent_news = new WP_Query(array(
 $news_titles = [];
 $news_contents = [];
 $news_thumbnails = [];
+$news_urls = [];
 
 if ($recent_news->have_posts()) {
     while ($recent_news->have_posts()) {
         $recent_news->the_post();
 
         $title = get_the_title();
-        $content = get_the_excerpt();
+        $content = wp_trim_words(get_the_content(), 50, '...');
         $thumbnail = get_the_post_thumbnail(null, 'large');
+        $url = get_the_permalink();
 
         $news_titles[] = $title;
         $news_contents[] = $content;
         $news_thumbnails[] = $thumbnail;
+        $news_urls[] = $url;
     }
 }
 $news_count = count($news_titles);
@@ -64,18 +67,19 @@ $news_count = count($news_titles);
 
             <div class="col-span-8 grid grid-cols-subgrid pt-6">
                 <!-- image -->
-                <div
-                    class="col-span-4 aspect-[4.5/4] overflow-hidden [&_img]:w-full [&_img]:h-full [&_img]:object-cover">
+                <a href=" <?= $news_urls[0] ?>"
+                    class="block col-span-4 aspect-[4.5/4] overflow-hidden [&_img]:w-full [&_img]:h-full [&_img]:object-cover">
                     <?= $news_thumbnails[0]; ?>
-                </div>
+                </a>
 
                 <div class="col-span-4">
                     <div class="flex flex-col justify-start items-start gap-4">
 
                         <!-- title -->
-                        <div class="justify-start text-white h2-style leading-6">
+                        <a href="<?= $news_urls[0] ?>"
+                            class="block justify-start text-white h2-style leading-6 hover:underline">
                             <?= $news_titles[0]; ?>
-                        </div>
+                        </a>
 
                         <!-- content -->
                         <div class="self-stretch justify-start text-white p-style leading-6">
@@ -84,9 +88,9 @@ $news_count = count($news_titles);
 
                         <!-- links -->
                         <div class="flex flex-col justify-center items-start gap-2">
-                            <div class="justify-start text-white link leading-4">
+                            <a href="<?= $news_urls[0] ?>" class="justify-start text-white link leading-4">
                                 Read more
-                            </div>
+                            </a>
                         </div>
 
                     </div>
@@ -104,7 +108,7 @@ $news_count = count($news_titles);
     ################################
     -->
 
-    <div class="grid grid-cols-12 gap-6 mx-6">
+    <div class="grid grid-cols-12 gap-6 mt-6 mx-6">
 
         <!-- 
     ################################
@@ -115,19 +119,23 @@ $news_count = count($news_titles);
         -->
 
         <?php for ($i = 1; $i < $news_count; $i++): ?>
-            <div class="col-start-5 col-span-8 grid grid-cols-subgrid pt-6">
+            <div class="col-start-5 col-span-8 grid grid-cols-subgrid">
+
                 <!-- image -->
-                <div class="col-span-4 aspect-[4.5/4] overflow-hidden [&_img]:w-full [&_img]:h-full [&_img]:object-cover">
+                <a href="<?= $news_urls[$i] ?>"
+                    class="col-span-4 aspect-[4.5/4] overflow-hidden [&_img]:w-full [&_img]:h-full [&_img]:object-cover">
                     <?= $news_thumbnails[$i]; ?>
-                </div>
+                </a>
 
                 <div class="col-span-4">
                     <div class="flex flex-col justify-start items-start gap-4">
 
                         <!-- title -->
-                        <div class="justify-start text-white h2-style leading-6">
+
+                        <a href="<?= $news_urls[$i] ?>"
+                            class="block justify-start text-white h2-style leading-6 hover:underline">
                             <?= $news_titles[$i]; ?>
-                        </div>
+                        </a>
 
                         <!-- content -->
                         <div class="self-stretch justify-start text-white p-style leading-6">
@@ -136,9 +144,9 @@ $news_count = count($news_titles);
 
                         <!-- links -->
                         <div class="flex flex-col justify-center items-start gap-2">
-                            <div class="justify-start text-white link leading-4">
+                            <a href="<?= $news_urls[$i] ?>" class="block justify-start text-white link leading-4">
                                 Read more
-                            </div>
+                            </a>
                         </div>
 
                     </div>
