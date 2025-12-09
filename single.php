@@ -201,14 +201,14 @@ endif;
                         <div class="col-span-6 mt-6 relative">
                             <!-- Previous Arrow - positioned on left -->
                             <button
-                                class="embla__button embla__button--prev absolute left-[-50px] top-1/2 -translate-y-1/2 z-10 p-2 hover:opacity-70 transition-opacity"
+                                class="scale-[70%] embla__button embla__button--prev absolute left-[-50px] top-1/2 -translate-y-1/2 z-10 p-2 hover:opacity-70 transition-opacity"
                                 type="button" aria-label="Previous">
                                 <?= page_turner_left('class="w-6 h-6"'); ?>
                             </button>
 
                             <!-- Next Arrow - positioned on right -->
                             <button
-                                class="embla__button embla__button--next absolute right-[-50px] top-1/2 -translate-y-1/2 z-10 p-2 hover:opacity-70 transition-opacity"
+                                class="scale-[70%] embla__button embla__button--next absolute right-[-50px] top-1/2 -translate-y-1/2 z-10 p-2 hover:opacity-70 transition-opacity"
                                 type="button" aria-label="Next">
                                 <?= page_turner_right('class="w-6 h-6"'); ?>
                             </button>
