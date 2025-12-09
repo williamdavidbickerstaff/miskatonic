@@ -5,10 +5,8 @@
 @import "tailwindcss";
 @import "./fonts.css";
 
-html {
-    visibility: visible;
-    opacity: 1;
-}
+/* html visibility/opacity is controlled by header.php and GSAP animations
+   to prevent content flash during page transitions */
 
 /* Embla carousel container with arrows */
 .embla {

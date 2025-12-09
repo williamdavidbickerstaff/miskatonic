@@ -31,18 +31,50 @@ export function initSectionFadeIn() {
 
 // Option 3: Fade in with more granular control
 export function initContentFadeIn() {
-    // Hide everything initially
+    // Ensure page is hidden initially (header.php already sets this, but we ensure it)
+    // Use visibility on html to prevent rendering, opacity on body for fade effect
+    gsap.set("html", {
+        visibility: "hidden",
+        opacity: 0,
+    });
+    gsap.set("body", {
+        opacity: 0,
+    });
     gsap.set(".mx-auto", { opacity: 0 });
 
-    // Create a timeline for sequential animations
-    const tl = gsap.timeline();
+    // Create a timeline for sequential animations - start immediately
+    const tl = gsap.timeline({ immediateRender: false });
 
-    // First fade in the container
-    tl.to(".mx-auto", {
+    // First make the page visible and fade in both html and body
+    // Start animation immediately with no delay
+    tl.set("html", { visibility: "visible" });
+    tl.to("html", {
         opacity: 1,
-        duration: 0.5,
+        duration: 0.3,
         ease: "power2.out",
+        immediateRender: true,
     });
+    tl.to(
+        "body",
+        {
+            opacity: 1,
+            duration: 0.3,
+            ease: "power2.out",
+            immediateRender: true,
+        },
+        "-=0.3"
+    );
+
+    // Then fade in the main container
+    tl.to(
+        ".mx-auto",
+        {
+            opacity: 1,
+            duration: 0.4,
+            ease: "power2.out",
+        },
+        "-=0.2"
+    );
 
     // Then animate wordmark elements
     tl.from(
@@ -158,14 +190,20 @@ export function initSimplePageTransitions() {
 
             e.preventDefault();
 
-            // Simple fade out of everything
-            gsap.to("body", {
+            // Fade out everything using both opacity and visibility
+            // This ensures complete hiding before navigation
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    // Ensure html is hidden before navigation
+                    gsap.set("html", { visibility: "hidden", opacity: 0 });
+                    window.location.href = href;
+                },
+            });
+
+            tl.to("body", {
                 opacity: 0,
                 duration: 0.4,
                 ease: "power2.in",
-                onComplete: () => {
-                    window.location.href = href;
-                },
             });
         });
     });
