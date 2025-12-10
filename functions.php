@@ -1,26 +1,20 @@
 <?php
 
-require_once 'inc/constants.php';
+add_action('wp_enqueue_scripts', function () {
+    $themeVersion = wp_get_theme()->get('Version');
+    $themeUri = get_template_directory_uri();
 
-if (file_exists(VITE_THEME_MANIFEST_PATH)) {
-    add_action('wp_enqueue_scripts', function () {
-        $manifest = json_decode(file_get_contents(VITE_THEME_MANIFEST_PATH), true);
-        $themeVersion = wp_get_theme()->get('Version');
-        if (is_array($manifest)) {
-            foreach ($manifest as $key => $value) {
-                $file = $value['file'];
-                $ext = pathinfo($file, PATHINFO_EXTENSION);
-                if ($ext === 'css') {
-                    wp_enqueue_style($key, VITE_THEME_ASSETS_DIR . '/' . $file, [], $themeVersion);
-                } elseif ($ext === 'js') {
-                    wp_enqueue_script($key, VITE_THEME_ASSETS_DIR . '/' . $file, [], $themeVersion, true);
-                }
-            }
-        }
-    });
-} else {
-    require_once 'inc/vite.php';
-}
+    // Enqueue compiled Tailwind CSS
+    wp_enqueue_style('theme-styles', $themeUri . '/assets/styles.css', [], $themeVersion);
+
+    // Enqueue Embla Carousel from CDN
+    wp_enqueue_script('embla-carousel', 'https://unpkg.com/embla-carousel@8.6.0/embla-carousel.umd.js', [], '8.6.0', true);
+    wp_enqueue_script('embla-carousel-fade', 'https://unpkg.com/embla-carousel-fade@8.6.0/embla-carousel-fade.umd.js', ['embla-carousel'], '8.6.0', true);
+
+    // Enqueue theme scripts
+    wp_enqueue_script('theme-scripts', $themeUri . '/resources/scripts/scripts.js', ['embla-carousel', 'embla-carousel-fade'], $themeVersion, true);
+    wp_enqueue_script('theme-app', $themeUri . '/resources/scripts/app.js', ['gsap-js', 'gsap-st'], $themeVersion, true);
+});
 
 
 add_action('after_setup_theme', function () {

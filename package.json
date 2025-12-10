@@ -1,23 +1,11 @@
 {
-  "name": "vite-starter-theme",
+  "name": "miskatonic-theme",
   "version": "1.0.0",
   "scripts": {
-    "build": "vite build",
-    "dev": "rimraf ./dist/.vite/manifest.json && vite"
+    "build": "npx @tailwindcss/cli -i ./resources/styles/styles.css -o ./assets/styles.css --minify",
+    "dev": "npx @tailwindcss/cli -i ./resources/styles/styles.css -o ./assets/styles.css --watch"
   },
   "devDependencies": {
-    "@fontsource/roboto": "^5.2.8",
-    "@tailwindcss/vite": "^4.1.13",
-    "rimraf": "^6.0.1",
-    "sharp": "^0.34.4",
-    "svgo": "^4.0.0",
-    "tailwindcss": "^4.1.13",
-    "vite": "^7.1.6",
-    "vite-plugin-image-optimizer": "^2.0.2"
-  },
-  "dependencies": {
-    "embla-carousel": "^8.6.0",
-    "embla-carousel-fade": "^8.6.0",
-    "gsap": "^3.13.0"
+    "@tailwindcss/cli": "^4.1.13"
   }
 }
