@@ -19,15 +19,6 @@ add_action('wp_enqueue_scripts', function () {
 
 
 add_action('after_setup_theme', function () {
-
-    // Add support for post thumbnails
-    add_theme_support('post-thumbnails');
-
-    add_image_size('news-large', 1024, 1024, true);
-    add_image_size('news-medium', 768, 768, true);
-    add_image_size('news-small', 512, 512, true);
-    add_image_size('news-thumbnail', 256, 256, true);
-
     remove_action('wp_head', 'wp_generator');
     remove_action('wp_head', 'print_emoji_detection_script', 7);
     remove_action('wp_print_styles', 'print_emoji_styles');
