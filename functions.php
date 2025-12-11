@@ -19,7 +19,6 @@ add_action('wp_enqueue_scripts', function () {
 
 
 add_action('after_setup_theme', function () {
-    add_theme_support('post-thumbnails');
     remove_action('wp_head', 'wp_generator');
     remove_action('wp_head', 'print_emoji_detection_script', 7);
     remove_action('wp_print_styles', 'print_emoji_styles');
@@ -30,6 +29,15 @@ add_action('after_setup_theme', function () {
     });
 });
 
+// Make custom image sizes available in the editor
+add_filter('image_size_names_choose', function ($sizes) {
+    return array_merge($sizes, [
+        'news-large'     => 'News Large (1024×1024)',
+        'news-medium'    => 'News Medium (768×768)',
+        'news-small'     => 'News Small (512×512)',
+        'news-thumbnail' => 'News Thumbnail (256×256)',
+    ]);
+});
 
 // The proper way to enqueue GSAP script in WordPress
 // wp_enqueue_script( $handle, $src, $deps, $ver, $in_footer );
