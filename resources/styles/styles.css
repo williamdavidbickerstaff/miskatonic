@@ -126,16 +126,21 @@
         @apply font-open font-normal text-lg leading-5;
     }
 
+    .post-content h1 {
+        @apply font-sutro font-medium text-2xl leading-none;
+    }
+
     .post-content h2 {
-        @apply font-sutro font-medium text-2xl leading-none text-left;
+        @apply font-open font-medium text-xl;
     }
 
     .post-content h3 {
-        @apply font-open font-medium text-xl;
+        @apply font-open font-medium text-base;
     }
 
     .post-content a {
         @apply font-open font-light text-base underline hover:no-underline;
     }
+
 
 }
