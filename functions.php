@@ -15,12 +15,19 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_script('theme-scripts', $themeUri . '/resources/scripts/scripts.js', ['embla-carousel', 'embla-carousel-fade'], $themeVersion, true);
     wp_enqueue_script('theme-app', $themeUri . '/resources/scripts/app.js', ['gsap-js', 'gsap-st'], $themeVersion, true);
 
-    add_theme_support('post-thumbnails');
-
 });
 
 
 add_action('after_setup_theme', function () {
+
+    // Add support for post thumbnails
+    add_theme_support('post-thumbnails');
+
+    add_image_size('news-large', 1024, 1024, true);
+    add_image_size('news-medium', 768, 768, true);
+    add_image_size('news-small', 512, 512, true);
+    add_image_size('news-thumbnail', 256, 256, true);
+
     remove_action('wp_head', 'wp_generator');
     remove_action('wp_head', 'print_emoji_detection_script', 7);
     remove_action('wp_print_styles', 'print_emoji_styles');
@@ -31,6 +38,15 @@ add_action('after_setup_theme', function () {
     });
 });
 
+// Make custom image sizes available in the editor
+add_filter('image_size_names_choose', function ($sizes) {
+    return array_merge($sizes, [
+        'news-large'     => 'News Large (1024×1024)',
+        'news-medium'    => 'News Medium (768×768)',
+        'news-small'     => 'News Small (512×512)',
+        'news-thumbnail' => 'News Thumbnail (256×256)',
+    ]);
+});
 
 // The proper way to enqueue GSAP script in WordPress
 // wp_enqueue_script( $handle, $src, $deps, $ver, $in_footer );
