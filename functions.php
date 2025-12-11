@@ -15,12 +15,11 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_script('theme-scripts', $themeUri . '/resources/scripts/scripts.js', ['embla-carousel', 'embla-carousel-fade'], $themeVersion, true);
     wp_enqueue_script('theme-app', $themeUri . '/resources/scripts/app.js', ['gsap-js', 'gsap-st'], $themeVersion, true);
 
-    add_theme_support('post-thumbnails');
-
 });
 
 
 add_action('after_setup_theme', function () {
+    add_theme_support('post-thumbnails');
     remove_action('wp_head', 'wp_generator');
     remove_action('wp_head', 'print_emoji_detection_script', 7);
     remove_action('wp_print_styles', 'print_emoji_styles');
