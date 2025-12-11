@@ -14,6 +14,9 @@ add_action('wp_enqueue_scripts', function () {
     // Enqueue theme scripts
     wp_enqueue_script('theme-scripts', $themeUri . '/resources/scripts/scripts.js', ['embla-carousel', 'embla-carousel-fade'], $themeVersion, true);
     wp_enqueue_script('theme-app', $themeUri . '/resources/scripts/app.js', ['gsap-js', 'gsap-st'], $themeVersion, true);
+
+    add_theme_support('post-thumbnails');
+
 });
 
 
