@@ -52,11 +52,6 @@ get_header();
                     </div>
                 <?php endif; ?>
 
-                <!-- Page Title -->
-                <h1 class="h1-style col-span-8 mt-6">
-                    <?= esc_html(get_the_title()) ?>
-                </h1>
-
                 <!-- Page Content -->
                 <div class="col-span-8 w-[95%] mt-6 flex flex-col gap-6 post-content">
                     <?php the_content(); ?>
