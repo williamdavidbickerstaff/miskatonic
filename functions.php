@@ -19,6 +19,9 @@ add_action('wp_enqueue_scripts', function () {
 
 
 add_action('after_setup_theme', function () {
+    // Enable featured images (thumbnails) for posts and pages
+    add_theme_support('post-thumbnails');
+
     remove_action('wp_head', 'wp_generator');
     remove_action('wp_head', 'print_emoji_detection_script', 7);
     remove_action('wp_print_styles', 'print_emoji_styles');
@@ -32,9 +35,9 @@ add_action('after_setup_theme', function () {
 // Make custom image sizes available in the editor
 add_filter('image_size_names_choose', function ($sizes) {
     return array_merge($sizes, [
-        'news-large'     => 'News Large (1024×1024)',
-        'news-medium'    => 'News Medium (768×768)',
-        'news-small'     => 'News Small (512×512)',
+        'news-large' => 'News Large (1024×1024)',
+        'news-medium' => 'News Medium (768×768)',
+        'news-small' => 'News Small (512×512)',
         'news-thumbnail' => 'News Thumbnail (256×256)',
     ]);
 });
@@ -88,6 +91,7 @@ function page_turner_right($attrs = '')
 define('PAGE_ID_TALKS', 15);
 define('PAGE_ID_NEWS', 2603);
 define('PAGE_ID_ARCHIVE', 252);
+define('PAGE_ID_ABOUT', 2);
 
 
 // ============================================
@@ -130,7 +134,7 @@ function insert_navbar($theme = 'dark')
         ['url' => get_page_link(PAGE_ID_ARCHIVE), 'label' => 'Archive'],
         ['url' => get_page_link(PAGE_ID_NEWS), 'label' => 'News'],
         ['url' => null, 'label' => 'FAQ'],
-        ['url' => null, 'label' => 'About'],
+        ['url' => get_page_link(PAGE_ID_ABOUT), 'label' => 'About'],
         ['url' => null, 'label' => 'Contact'],
     ];
 
