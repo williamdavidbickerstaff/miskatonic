@@ -114,8 +114,10 @@ $merch_items = [
                 <!-- Featured Image (Posts only) -->
                 <?php if (has_post_thumbnail() && !$is_event): ?>
                     <?php $featured_image = wp_get_attachment_image_src(get_post_thumbnail_id(get_the_ID()), 'full'); ?>
-                    <img class="col-span-8 mt-6 outline outline-offset-[-1px]" src="<?= esc_url($featured_image[0]) ?>"
-                        alt="<?= esc_attr(get_the_title()) ?>" />
+                    <div class="col-span-8 mt-6 aspect-hero overflow-hidden">
+                        <img class="w-full h-full object-cover" src="<?= esc_url($featured_image[0]) ?>"
+                            alt="<?= esc_attr(get_the_title()) ?>" />
+                    </div>
                 <?php endif; ?>
 
                 <!-- Event Image (Events only) -->
@@ -123,6 +125,8 @@ $merch_items = [
                     <div class="
                         col-span-8 mt-6 relative
                         [&_img]:w-full [&_img]:h-full [&_img]:object-cover
+                        overflow-hidden
+                        aspect-hero
                     ">
                         <?= $current_event['image'] ?>
 

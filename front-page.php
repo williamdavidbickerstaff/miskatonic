@@ -101,20 +101,20 @@ if (class_exists('EM_Events')) {
     ################################
     -->
 
-    <div class="grid grid-cols-12 gap-6 mx-6">
-        <div class="col-span-4 flex flex-col items-start justify-between pt-6">
+    <div class="grid grid-cols-6 md:grid-cols-12 gap-6 mx-6">
+        <div class="col-span-6 md:col-span-4 flex flex-col items-start justify-between pt-6">
             <a href="<?= home_url() ?>" class="block">
                 <div>
-                    <h1 class="text-white title-style wordmark-element" data-wordmark>MIS</h1>
-                    <h1 class="text-white title-style wordmark-element" data-wordmark>KA</h1>
-                    <h1 class="text-white title-style wordmark-element" data-wordmark>TON</h1>
-                    <h1 class="text-white title-style wordmark-element" data-wordmark>IC</h1>
+                    <h1 class="text-white title-style wordmark-element text-6xl md:text-8xl" data-wordmark>MIS</h1>
+                    <h1 class="text-white title-style wordmark-element text-6xl md:text-8xl" data-wordmark>KA</h1>
+                    <h1 class="text-white title-style wordmark-element text-6xl md:text-8xl" data-wordmark>TON</h1>
+                    <h1 class="text-white title-style wordmark-element text-6xl md:text-8xl" data-wordmark>IC</h1>
                     <h1 class="h1-style col-span-2 mt-6 text-white text-wrap wordmark-element" data-wordmark>
                         Institute of <br> Horror Studies
                     </h1>
                 </div>
             </a>
-            <div class="w-[60%]">
+            <div class="w-full md:w-[60%] mt-6 md:mt-0">
                 <a href="<?= get_page_link(15) ?>" class="block">
                     <h1 class="h1-style text-white text-wrap hover:underline decoration-2"> Upcoming talks </h1>
                 </a>
@@ -124,27 +124,28 @@ if (class_exists('EM_Events')) {
             </div>
         </div>
 
-        <div class="col-start-5 col-span-8 pt-6 grid grid-cols-subgrid">
+        <div class="col-span-6 md:col-start-5 md:col-span-8 pt-6 grid grid-cols-6 md:grid-cols-subgrid">
 
             <?= insert_navbar('dark') ?>
 
             <?php if ($events_length > 0): ?>
 
-                <div class="col-span-8 grid grid-cols-subgrid mt-6">
-                    <div class="group col-span-8 relative [&_img]:w-full [&_img]:h-full [&_img]:object-cover">
+                <div class="col-span-6 md:col-span-8 grid grid-cols-6 md:grid-cols-subgrid mt-6">
+                    <div
+                        class="group col-span-6 md:col-span-8 relative aspect-[4/3] md:aspect-hero overflow-hidden [&_img]:w-full [&_img]:h-full [&_img]:object-cover">
                         <a href="<?= $event_urls[0]; ?>" class="absolute inset-0 z-10"></a>
                         <?= $event_images[0]; ?>
                         <!-- Bottom-right badge -->
                         <div
-                            class="group-hover:invert animation duration-300 absolute leading-none text-left bottom-4 right-4 outline w-48 p-2 bg-black text-white h4-style font-medium">
+                            class="group-hover:invert animation duration-300 absolute leading-none text-left bottom-4 right-4 outline w-36 md:w-48 p-2 bg-black text-white h4-style font-medium">
                             <?= $event_tags[0]; ?>
                         </div>
                     </div>
                     <!-- info box -->
-                    <div class="col-span-4 grid grid-cols-subgrid h-[148px] mt-6">
+                    <div class="col-span-6 md:col-span-4 grid grid-cols-6 md:grid-cols-subgrid h-auto md:h-[148px] mt-6">
 
                         <!-- left text -->
-                        <div class="flex-col justify-between items-start inline-flex col-span-3">
+                        <div class="flex-col justify-between items-start inline-flex col-span-5 md:col-span-3 gap-4 md:gap-0">
                             <a href="<?= $event_urls[0] ?>" class="block">
                                 <h2 class="text-white h2-style leading-none justify-start hover:underline">
                                     <?php echo esc_html('' . $trimmed_names[0] . ''); ?>

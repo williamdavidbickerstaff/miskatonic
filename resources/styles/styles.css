@@ -75,6 +75,9 @@
 
     --color-bg: var(--bg);
     --color-text: var(--text);
+
+    --aspect-card: 4.5 / 4;
+    --aspect-hero: 10 / 5;
 }
 
 @layer components {
